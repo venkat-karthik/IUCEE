@@ -1,0 +1,1653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISL Sign Language Vocalizer — Software Documentation</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e17;
+    --surface: #111827;
+    --surface2: #1a2333;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: #e8edf5;
+    --muted: #7a8aa0;
+    --accent: #4f9cf9;
+    --accent2: #a78bfa;
+    --green: #34d399;
+    --amber: #fbbf24;
+    --coral: #f87171;
+    --teal: #2dd4bf;
+    --pink: #f472b6;
+    --mono: 'JetBrains Mono', monospace;
+    --display: 'Syne', sans-serif;
+    --body: 'Inter', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* ─── COVER ─── */
+  .cover {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 60px;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border2);
+  }
+
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(79,156,249,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .cover::after {
+    content: '';
+    position: absolute;
+    bottom: -150px; left: -100px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(167,139,250,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .cover-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+
+  .cover h1 {
+    font-family: var(--display);
+    font-size: clamp(36px, 6vw, 68px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+
+  .cover h1 span { color: var(--accent); }
+
+  .cover-sub {
+    font-size: 18px;
+    color: var(--muted);
+    font-weight: 300;
+    margin-bottom: 48px;
+    max-width: 520px;
+  }
+
+  .cover-meta {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .meta-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .meta-value {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  /* ─── LAYOUT ─── */
+  .page { max-width: 960px; margin: 0 auto; padding: 0 40px; }
+
+  /* ─── SECTION ─── */
+  section { padding: 72px 0 40px; border-bottom: 1px solid var(--border); }
+  section:last-child { border-bottom: none; }
+
+  .section-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  h2 {
+    font-family: var(--display);
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+    line-height: 1.1;
+  }
+
+  h3 {
+    font-family: var(--display);
+    font-size: 20px;
+    font-weight: 600;
+    margin: 36px 0 12px;
+    color: var(--text);
+  }
+
+  h4 {
+    font-family: var(--display);
+    font-size: 15px;
+    font-weight: 600;
+    margin: 24px 0 8px;
+    color: var(--accent);
+  }
+
+  .section-intro {
+    font-size: 16px;
+    color: var(--muted);
+    max-width: 640px;
+    margin-bottom: 40px;
+    line-height: 1.8;
+  }
+
+  p { margin-bottom: 14px; color: var(--text); }
+
+  /* ─── TOC ─── */
+  .toc {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    padding: 32px;
+    margin: 48px 0;
+  }
+
+  .toc-title {
+    font-family: var(--display);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+
+  .toc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 40px;
+  }
+
+  .toc-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--text);
+    font-size: 14px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+    transition: color 0.2s;
+  }
+
+  .toc-item:hover { color: var(--accent); }
+
+  .toc-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    min-width: 24px;
+  }
+
+  /* ─── PHASE CARDS ─── */
+  .phase-card {
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 16px;
+    background: var(--surface);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .phase-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+  }
+
+  .phase-card.p1::before { background: var(--muted); }
+  .phase-card.p2::before { background: var(--teal); }
+  .phase-card.p3::before { background: var(--accent2); }
+  .phase-card.p4::before { background: var(--amber); }
+  .phase-card.p5::before { background: var(--coral); }
+
+  .phase-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+  }
+
+  .phase-title {
+    font-family: var(--display);
+    font-size: 17px;
+    font-weight: 600;
+  }
+
+  .phase-week {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--surface2);
+    padding: 3px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .phase-desc { font-size: 14px; color: var(--muted); }
+
+  .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+
+  .tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 4px;
+    border: 1px solid var(--border2);
+    color: var(--muted);
+  }
+
+  /* ─── FLOWCHARTS ─── */
+  .diagram-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    padding: 32px 24px;
+    margin: 24px 0;
+    overflow-x: auto;
+  }
+
+  .diagram-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  svg text { font-family: var(--body) !important; }
+
+  /* ─── CODE BLOCKS ─── */
+  .code-block {
+    background: #0d1117;
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin: 16px 0;
+    overflow-x: auto;
+  }
+
+  .code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .code-filename {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+  }
+
+  .code-lang {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    background: var(--surface2);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  pre {
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.7;
+    color: #c9d1d9;
+    white-space: pre;
+    overflow-x: auto;
+  }
+
+  .kw  { color: #ff7b72; }
+  .fn  { color: #d2a8ff; }
+  .str { color: #a5d6ff; }
+  .cm  { color: #4d5963; font-style: italic; }
+  .nb  { color: #ffa657; }
+  .num { color: #79c0ff; }
+  .op  { color: #ff7b72; }
+
+  /* ─── INFO BOXES ─── */
+  .info-box {
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    font-size: 14px;
+    border-left: 3px solid;
+  }
+
+  .info-box.tip { background: rgba(52,211,153,0.07); border-color: var(--green); }
+  .info-box.warn { background: rgba(251,191,36,0.07); border-color: var(--amber); }
+  .info-box.danger { background: rgba(248,113,113,0.07); border-color: var(--coral); }
+  .info-box.note { background: rgba(79,156,249,0.07); border-color: var(--accent); }
+
+  .info-box-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  .info-box.tip .info-box-title    { color: var(--green); }
+  .info-box.warn .info-box-title   { color: var(--amber); }
+  .info-box.danger .info-box-title { color: var(--coral); }
+  .info-box.note .info-box-title   { color: var(--accent); }
+
+  /* ─── TOOLS TABLE ─── */
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+    margin: 20px 0;
+  }
+
+  .tool-card {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    padding: 16px 18px;
+  }
+
+  .tool-name {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+
+  .tool-purpose {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .tool-install {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--green);
+    margin-top: 8px;
+    padding: 3px 8px;
+    background: rgba(52,211,153,0.07);
+    border-radius: 4px;
+    display: inline-block;
+  }
+
+  /* ─── STEP LIST ─── */
+  .step-list { list-style: none; margin: 16px 0; }
+
+  .step-list li {
+    display: flex;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: flex-start;
+    font-size: 14px;
+  }
+
+  .step-list li:last-child { border-bottom: none; }
+
+  .step-num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    background: rgba(79,156,249,0.1);
+    border: 1px solid rgba(79,156,249,0.25);
+    border-radius: 4px;
+    padding: 2px 7px;
+    min-width: 32px;
+    text-align: center;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+
+  /* ─── TWO-COL ─── */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 20px 0;
+  }
+
+  @media (max-width: 680px) {
+    .two-col { grid-template-columns: 1fr; }
+    .toc-grid { grid-template-columns: 1fr; }
+    .cover { padding: 60px 24px; }
+    .page { padding: 0 20px; }
+  }
+
+  /* ─── FOOTER ─── */
+  .footer {
+    padding: 40px 0;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+  }
+
+  /* ─── DIVIDER ─── */
+  hr { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+
+  /* ─── INLINE CODE ─── */
+  code {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: var(--surface2);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+
+  /* ─── ARCH PILL ─── */
+  .arch-row {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin: 20px 0;
+    flex-wrap: wrap;
+  }
+
+  .arch-pill {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 6px;
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .arch-arrow {
+    color: var(--muted);
+    font-size: 18px;
+    padding: 0 6px;
+    flex-shrink: 0;
+  }
+
+  /* ─── CHECKLIST ─── */
+  .checklist { list-style: none; margin: 12px 0; }
+
+  .checklist li {
+    display: flex;
+    gap: 10px;
+    font-size: 14px;
+    padding: 5px 0;
+    color: var(--muted);
+    align-items: flex-start;
+  }
+
+  .checklist li::before {
+    content: '○';
+    color: var(--border2);
+    font-size: 14px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .label-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+
+  .badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+  }
+
+  .badge.green  { background: rgba(52,211,153,0.12);  color: var(--green);  border: 1px solid rgba(52,211,153,0.25); }
+  .badge.amber  { background: rgba(251,191,36,0.12);  color: var(--amber);  border: 1px solid rgba(251,191,36,0.25); }
+  .badge.blue   { background: rgba(79,156,249,0.12);  color: var(--accent); border: 1px solid rgba(79,156,249,0.25); }
+  .badge.purple { background: rgba(167,139,250,0.12); color: var(--accent2);border: 1px solid rgba(167,139,250,0.25); }
+  .badge.coral  { background: rgba(248,113,113,0.12); color: var(--coral);  border: 1px solid rgba(248,113,113,0.25); }
+
+  /* print */
+  @media print {
+    body { background: #fff; color: #111; }
+    .cover { background: #fff; }
+    .code-block { border: 1px solid #ccc; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════ COVER ══════════════════════════════ -->
+<div class="cover">
+  <div class="page">
+    <div class="cover-tag">Software Engineering Documentation · v1.0</div>
+    <h1>ISL Sign Language<br><span>Vocalizer</span></h1>
+    <p class="cover-sub">Complete software architecture, data pipelines, ML training workflow, and deployment guide for the smart glove system.</p>
+    <div class="cover-meta">
+      <div class="meta-item">
+        <span class="meta-label">Document Type</span>
+        <span class="meta-value">Technical Reference</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Domain</span>
+        <span class="meta-value">Embedded ML / TinyML</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Stack</span>
+        <span class="meta-value">Python · TensorFlow · ESP32</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label">Audience</span>
+        <span class="meta-value">Software Team</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+<!-- ══════════════════════════════ TOC ══════════════════════════════ -->
+<div class="toc">
+  <div class="toc-title">Table of Contents</div>
+  <div class="toc-grid">
+    <a href="#overview"      class="toc-item"><span class="toc-num">01</span> System Overview</a>
+    <a href="#tools"         class="toc-item"><span class="toc-num">02</span> Software Stack & Tools</a>
+    <a href="#phase1"        class="toc-item"><span class="toc-num">03</span> Phase 1 — Serial Data Bridge</a>
+    <a href="#phase2"        class="toc-item"><span class="toc-num">04</span> Phase 2 — Data Collection Pipeline</a>
+    <a href="#phase3"        class="toc-item"><span class="toc-num">05</span> Phase 3 — ML Model Training</a>
+    <a href="#phase4"        class="toc-item"><span class="toc-num">06</span> Phase 4 — TinyML Deployment</a>
+    <a href="#phase5"        class="toc-item"><span class="toc-num">07</span> Phase 5 — Voice Output</a>
+    <a href="#architecture"  class="toc-item"><span class="toc-num">08</span> Full System Architecture</a>
+    <a href="#pitfalls"      class="toc-item"><span class="toc-num">09</span> Common Pitfalls</a>
+    <a href="#checklist"     class="toc-item"><span class="toc-num">10</span> Team Checklist</a>
+  </div>
+</div>
+
+<!-- ══════════════════════════════ 01: OVERVIEW ══════════════════════════════ -->
+<section id="overview">
+  <div class="section-tag">01 — System Overview</div>
+  <h2>What We're Building</h2>
+  <p class="section-intro">The ISL Vocalizer is a wearable glove that translates Indian Sign Language gestures into spoken words in real time. The software team owns everything from the moment sensor data leaves the ESP32 chip to the moment a speaker says the recognized word.</p>
+
+  <h3>The Big Picture Flow</h3>
+
+  <div class="diagram-wrap">
+    <div class="diagram-label">End-to-end system flow</div>
+    <svg width="100%" viewBox="0 0 860 100" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#4f9cf9" stroke-width="1.5" stroke-linecap="round"/>
+        </marker>
+      </defs>
+      <!-- boxes -->
+      <rect x="10"  y="28" width="110" height="44" rx="6" fill="#1a2333" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+      <rect x="160" y="28" width="110" height="44" rx="6" fill="#1a2333" stroke="rgba(45,212,191,0.4)" stroke-width="1"/>
+      <rect x="310" y="28" width="130" height="44" rx="6" fill="#1a2333" stroke="rgba(167,139,250,0.4)" stroke-width="1"/>
+      <rect x="490" y="28" width="130" height="44" rx="6" fill="#1a2333" stroke="rgba(251,191,36,0.4)" stroke-width="1"/>
+      <rect x="670" y="28" width="110" height="44" rx="6" fill="#1a2333" stroke="rgba(248,113,113,0.4)" stroke-width="1"/>
+      <!-- labels -->
+      <text x="65"  y="45" text-anchor="middle" fill="#7a8aa0" font-size="10" font-family="Inter">Glove Sensors</text>
+      <text x="65"  y="60" text-anchor="middle" fill="#e8edf5" font-size="11" font-family="Inter" font-weight="500">ESP32</text>
+      <text x="215" y="45" text-anchor="middle" fill="#2dd4bf" font-size="10" font-family="Inter">Phase 1</text>
+      <text x="215" y="60" text-anchor="middle" fill="#e8edf5" font-size="11" font-family="Inter" font-weight="500">Serial Bridge</text>
+      <text x="375" y="45" text-anchor="middle" fill="#a78bfa" font-size="10" font-family="Inter">Phase 2–3</text>
+      <text x="375" y="60" text-anchor="middle" fill="#e8edf5" font-size="11" font-family="Inter" font-weight="500">Data + ML Training</text>
+      <text x="555" y="45" text-anchor="middle" fill="#fbbf24" font-size="10" font-family="Inter">Phase 4</text>
+      <text x="555" y="60" text-anchor="middle" fill="#e8edf5" font-size="11" font-family="Inter" font-weight="500">TinyML on Device</text>
+      <text x="725" y="45" text-anchor="middle" fill="#f87171" font-size="10" font-family="Inter">Phase 5</text>
+      <text x="725" y="60" text-anchor="middle" fill="#e8edf5" font-size="11" font-family="Inter" font-weight="500">Voice Output</text>
+      <!-- arrows -->
+      <line x1="122" y1="50" x2="158" y2="50" stroke="#4f9cf9" stroke-width="1.5" marker-end="url(#arr)"/>
+      <line x1="272" y1="50" x2="308" y2="50" stroke="#4f9cf9" stroke-width="1.5" marker-end="url(#arr)"/>
+      <line x1="442" y1="50" x2="488" y2="50" stroke="#4f9cf9" stroke-width="1.5" marker-end="url(#arr)"/>
+      <line x1="622" y1="50" x2="668" y2="50" stroke="#4f9cf9" stroke-width="1.5" marker-end="url(#arr)"/>
+    </svg>
+  </div>
+
+  <h3>Software Team Responsibilities</h3>
+  <p>As the software team, you do <strong>not</strong> write the ESP32 firmware (that's the hardware team). You own everything after the USB cable:</p>
+
+  <div class="two-col">
+    <div class="phase-card p2">
+      <div class="phase-header">
+        <div class="phase-title">What you own</div>
+      </div>
+      <ul class="step-list">
+        <li><span class="step-num">✓</span>Python serial reader script</li>
+        <li><span class="step-num">✓</span>Data collection + labeling tool</li>
+        <li><span class="step-num">✓</span>Dataset cleaning and normalization</li>
+        <li><span class="step-num">✓</span>ML model design, training, evaluation</li>
+        <li><span class="step-num">✓</span>Model export for embedded deployment</li>
+        <li><span class="step-num">✓</span>Voice output app (Android / BT)</li>
+        <li><span class="step-num">✓</span>End-to-end integration testing</li>
+      </ul>
+    </div>
+    <div class="phase-card p5">
+      <div class="phase-header">
+        <div class="phase-title">What hardware owns</div>
+      </div>
+      <ul class="step-list">
+        <li><span class="step-num">✗</span>ESP32 Arduino firmware</li>
+        <li><span class="step-num">✗</span>Flex sensor wiring and calibration</li>
+        <li><span class="step-num">✗</span>IMU sensor integration</li>
+        <li><span class="step-num">✗</span>Serial output format (you define it together)</li>
+        <li><span class="step-num">✗</span>Physical glove assembly</li>
+        <li><span class="step-num">✗</span>Speaker / DFPlayer module</li>
+        <li><span class="step-num">✗</span>Bluetooth module setup</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="info-box note">
+    <div class="info-box-title">Important Handshake</div>
+    The one thing both teams must agree on upfront is the <strong>serial data format</strong> — the exact structure of what the ESP32 prints over USB. Define this in week 1 and don't change it without informing both sides.
+  </div>
+
+  <h3>Agreed Serial Format (define with hardware team)</h3>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-filename">serial_format.txt</span>
+      <span class="code-lang">UART 9600 baud</span>
+    </div>
+    <pre><span class="cm"># Each line the ESP32 prints — comma-separated, newline-terminated</span>
+<span class="cm"># Format: thumb,index,middle,ring,pinky,ax,ay,az,gx,gy,gz</span>
+
+<span class="num">820</span>,<span class="num">700</span>,<span class="num">200</span>,<span class="num">150</span>,<span class="num">300</span>,<span class="num">0.12</span>,<span class="num">-0.05</span>,<span class="num">9.81</span>,<span class="num">12</span>,<span class="num">-5</span>,<span class="num">3</span>
+
+<span class="cm"># Field breakdown:
+# thumb, index, middle, ring, pinky  →  flex sensor ADC values (0–4095)
+# ax, ay, az                          →  accelerometer (m/s²)
+# gx, gy, gz                          →  gyroscope (degrees/sec)
+# 11 values total per line
+# Baud rate: 9600
+# Line terminator: \r\n</span></pre>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ 02: TOOLS ══════════════════════════════ -->
+<section id="tools">
+  <div class="section-tag">02 — Software Stack</div>
+  <h2>Tools & Technologies</h2>
+  <p class="section-intro">Everything you need to install and learn, organized by when you'll need it. Do not install everything on day 1 — follow the phase order.</p>
+
+  <h3>Phase 1–2: Data Tools (Install Week 1)</h3>
+  <div class="tools-grid">
+    <div class="tool-card">
+      <div class="tool-name">Python 3.10+</div>
+      <div class="tool-purpose">Core language for all data and ML work</div>
+      <span class="tool-install">python.org/downloads</span>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">pyserial</div>
+      <div class="tool-purpose">Reads sensor data from ESP32 over USB</div>
+      <span class="tool-install">pip install pyserial</span>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">pandas</div>
+      <div class="tool-purpose">Dataset management and cleaning</div>
+      <span class="tool-install">pip install pandas</span>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">numpy</div>
+      <div class="tool-purpose">Numerical operations on sensor arrays</div>
+      <span class="tool-install">pip install numpy</span>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">matplotlib</div>
+      <div class="tool-purpose">Visualize sensor data and training curves</div>
+      <span class="tool-install">pip install matplotlib</span>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">VS Code</div>
+      <div class="tool-purpose">Primary code editor for Python scripts</div>
+      <span class="tool-install">code.visualstudio.com</span>
+    </div>
+  </div>
+
+  <h3>Phase 3: ML Training (Install Week 3)</h3>
+  <div class="tools-grid">
+    <div class="tool-card">
+      <div class="tool-name">TensorFlow 2.x</div>
+      <div class="tool-purpose">Neural network training framework</div>
+      <span class="tool-install">pip install tensorflow</span>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">scikit-learn</div>
+      <div class="tool-purpose">Preprocessing, evaluation, confusion matrix</div>
+      <span class="tool-install">pip install scikit-learn</span>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">Jupyter Notebook</div>
+      <div class="tool-purpose">Interactive ML experimentation environment</div>
+      <span class="tool-install">pip install jupyter</span>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">Google Colab</div>
+      <div class="tool-purpose">Free cloud GPU if local machine is slow</div>
+      <span class="tool-install">colab.research.google.com</span>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">seaborn</div>
+      <div class="tool-purpose">Confusion matrix heatmaps, plots</div>
+      <span class="tool-install">pip install seaborn</span>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">Git + GitHub</div>
+      <div class="tool-purpose">Version control for code and datasets</div>
+      <span class="tool-install">git-scm.com</span>
+    </div>
+  </div>
+
+  <h3>Phase 4–5: Deployment (Install Week 5)</h3>
+  <div class="tools-grid">
+    <div class="tool-card">
+      <div class="tool-name">Edge Impulse</div>
+      <div class="tool-purpose">Easiest path to deploy ML model on ESP32</div>
+      <span class="tool-install">edgeimpulse.com (free)</span>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">Arduino IDE</div>
+      <div class="tool-purpose">Understand firmware (hardware team uses this)</div>
+      <span class="tool-install">arduino.cc/en/software</span>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">Android Studio</div>
+      <div class="tool-purpose">Build Bluetooth TTS output app</div>
+      <span class="tool-install">developer.android.com</span>
+    </div>
+    <div class="tool-card">
+      <div class="tool-name">MIT App Inventor</div>
+      <div class="tool-purpose">Fast no-code Bluetooth TTS app alternative</div>
+      <span class="tool-install">appinventor.mit.edu</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ 03: PHASE 1 ══════════════════════════════ -->
+<section id="phase1">
+  <div class="section-tag">03 — Phase 1</div>
+  <h2>Serial Data Bridge</h2>
+  <div class="label-row">
+    <span class="badge green">Week 1–2</span>
+    <span class="badge blue">pyserial</span>
+    <span class="badge blue">Python</span>
+  </div>
+  <p class="section-intro">Your first task. The hardware team has the ESP32 printing sensor values over USB. You write the Python script that receives, validates, and logs this data. Everything downstream depends on this working correctly.</p>
+
+  <h3>Phase 1 Flowchart</h3>
+  <div class="diagram-wrap">
+    <div class="diagram-label">Serial reader decision flow</div>
+    <svg width="100%" viewBox="0 0 700 480" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="a1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#4f9cf9" stroke-width="1.5" stroke-linecap="round"/>
+        </marker>
+        <marker id="a1r" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#f87171" stroke-width="1.5" stroke-linecap="round"/>
+        </marker>
+        <marker id="a1g" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#34d399" stroke-width="1.5" stroke-linecap="round"/>
+        </marker>
+      </defs>
+
+      <!-- Open port -->
+      <rect x="240" y="10" width="220" height="44" rx="8" fill="#1a2333" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+      <text x="350" y="28" text-anchor="middle" fill="#7a8aa0" font-size="11" font-family="Inter">Start</text>
+      <text x="350" y="46" text-anchor="middle" fill="#e8edf5" font-size="12" font-family="Inter" font-weight="500">Open serial port (COM3 / ttyUSB0)</text>
+
+      <line x1="350" y1="54" x2="350" y2="90" stroke="#4f9cf9" stroke-width="1.5" marker-end="url(#a1)"/>
+
+      <!-- Read line -->
+      <rect x="220" y="90" width="260" height="44" rx="8" fill="#1a2333" stroke="rgba(45,212,191,0.4)" stroke-width="1"/>
+      <text x="350" y="117" text-anchor="middle" fill="#e8edf5" font-size="13" font-family="Inter" font-weight="500">Read line from serial buffer</text>
+
+      <line x1="350" y1="134" x2="350" y2="168" stroke="#4f9cf9" stroke-width="1.5" marker-end="url(#a1)"/>
+
+      <!-- Decode -->
+      <rect x="220" y="168" width="260" height="44" rx="8" fill="#1a2333" stroke="rgba(45,212,191,0.4)" stroke-width="1"/>
+      <text x="350" y="195" text-anchor="middle" fill="#e8edf5" font-size="13" font-family="Inter" font-weight="500">Decode UTF-8, strip whitespace</text>
+
+      <line x1="350" y1="212" x2="350" y2="246" stroke="#4f9cf9" stroke-width="1.5" marker-end="url(#a1)"/>
+
+      <!-- Validate -->
+      <rect x="210" y="246" width="280" height="44" rx="8" fill="#1a2333" stroke="rgba(251,191,36,0.4)" stroke-width="1"/>
+      <text x="350" y="264" text-anchor="middle" fill="#fbbf24" font-size="10" font-family="Inter">Decision</text>
+      <text x="350" y="280" text-anchor="middle" fill="#e8edf5" font-size="13" font-family="Inter" font-weight="500">Split by comma → exactly 11 values?</text>
+
+      <!-- NO branch -->
+      <line x1="210" y1="268" x2="140" y2="268" stroke="#f87171" stroke-width="1.5" marker-end="url(#a1r)"/>
+      <text x="174" y="262" text-anchor="middle" fill="#f87171" font-size="10" font-family="Inter">NO</text>
+      <rect x="40" y="246" width="100" height="44" rx="8" fill="#1a2333" stroke="rgba(248,113,113,0.3)" stroke-width="1"/>
+      <text x="90" y="268" text-anchor="middle" fill="#f87171" font-size="12" font-family="Inter">Log warning,</text>
+      <text x="90" y="282" text-anchor="middle" fill="#f87171" font-size="12" font-family="Inter">skip row</text>
+      <line x1="90" y1="246" x2="90" y2="104" stroke="#f87171" stroke-width="1" stroke-dasharray="4,3"/>
+      <line x1="90" y1="104" x2="220" y2="104" stroke="#f87171" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#a1r)"/>
+
+      <!-- YES branch -->
+      <line x1="350" y1="290" x2="350" y2="324" stroke="#34d399" stroke-width="1.5" marker-end="url(#a1g)"/>
+      <text x="360" y="312" fill="#34d399" font-size="10" font-family="Inter">YES</text>
+
+      <!-- Cast to float -->
+      <rect x="220" y="324" width="260" height="44" rx="8" fill="#1a2333" stroke="rgba(52,211,153,0.4)" stroke-width="1"/>
+      <text x="350" y="351" text-anchor="middle" fill="#e8edf5" font-size="13" font-family="Inter" font-weight="500">Cast all values to float</text>
+
+      <line x1="350" y1="368" x2="350" y2="402" stroke="#4f9cf9" stroke-width="1.5" marker-end="url(#a1)"/>
+
+      <!-- Write CSV -->
+      <rect x="220" y="402" width="260" height="44" rx="8" fill="#1a2333" stroke="rgba(79,156,249,0.4)" stroke-width="1"/>
+      <text x="350" y="419" text-anchor="middle" fill="#7a8aa0" font-size="10" font-family="Inter">Output</text>
+      <text x="350" y="436" text-anchor="middle" fill="#e8edf5" font-size="13" font-family="Inter" font-weight="500">Append row to CSV + print to console</text>
+
+      <!-- Loop back arrow -->
+      <line x1="480" y1="424" x2="560" y2="424" stroke="#4f9cf9" stroke-width="1" stroke-dasharray="4,3"/>
+      <line x1="560" y1="424" x2="560" y2="104" stroke="#4f9cf9" stroke-width="1" stroke-dasharray="4,3"/>
+      <line x1="560" y1="104" x2="482" y2="104" stroke="#4f9cf9" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#a1)"/>
+      <text x="598" y="270" text-anchor="middle" fill="#4f9cf9" font-size="10" font-family="Inter" transform="rotate(90,598,270)">loop</text>
+    </svg>
+  </div>
+
+  <h3>The Code</h3>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-filename">serial_reader.py</span>
+      <span class="code-lang">Python</span>
+    </div>
+    <pre><span class="kw">import</span> serial
+<span class="kw">import</span> csv
+<span class="kw">import</span> time
+
+<span class="cm"># ── CONFIG ─────────────────────────────────────────────────────</span>
+PORT     = <span class="str">'COM3'</span>          <span class="cm"># Windows: COM3  |  Linux/Mac: /dev/ttyUSB0</span>
+BAUDRATE = <span class="num">9600</span>
+COLUMNS  = [<span class="str">'thumb'</span>,<span class="str">'index'</span>,<span class="str">'middle'</span>,<span class="str">'ring'</span>,<span class="str">'pinky'</span>,
+            <span class="str">'ax'</span>,<span class="str">'ay'</span>,<span class="str">'az'</span>,<span class="str">'gx'</span>,<span class="str">'gy'</span>,<span class="str">'gz'</span>]
+
+<span class="cm"># ── OPEN CONNECTION ─────────────────────────────────────────────</span>
+port = serial.<span class="fn">Serial</span>(PORT, BAUDRATE, timeout=<span class="num">1</span>)
+<span class="kw">print</span>(<span class="str">f"Connected to {PORT}. Listening..."</span>)
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="str">'raw_data.csv'</span>, <span class="str">'w'</span>, newline=<span class="str">''</span>) <span class="kw">as</span> f:
+    writer = csv.<span class="fn">writer</span>(f)
+    writer.<span class="fn">writerow</span>(COLUMNS)          <span class="cm"># header row</span>
+
+    <span class="kw">while</span> <span class="nb">True</span>:
+        <span class="kw">try</span>:
+            raw  = port.<span class="fn">readline</span>().<span class="fn">decode</span>(<span class="str">'utf-8'</span>).<span class="fn">strip</span>()
+            vals = raw.<span class="fn">split</span>(<span class="str">','</span>)
+
+            <span class="kw">if</span> <span class="fn">len</span>(vals) != <span class="num">11</span>:
+                <span class="kw">print</span>(<span class="str">f"[WARN] Bad line: {raw}"</span>)
+                <span class="kw">continue</span>
+
+            row = [<span class="fn">float</span>(v) <span class="kw">for</span> v <span class="kw">in</span> vals]
+            writer.<span class="fn">writerow</span>(row)
+            <span class="kw">print</span>(row)               <span class="cm"># live feedback</span>
+
+        <span class="kw">except</span> <span class="nb">ValueError</span>:
+            <span class="kw">print</span>(<span class="str">"[WARN] Non-numeric value, skipping"</span>)
+        <span class="kw">except</span> <span class="nb">KeyboardInterrupt</span>:
+            <span class="kw">print</span>(<span class="str">"\nStopped. Data saved to raw_data.csv"</span>)
+            <span class="kw">break</span></pre>
+  </div>
+
+  <div class="info-box tip">
+    <div class="info-box-title">How to find your COM port</div>
+    Windows: Open Device Manager → Ports (COM & LPT) → look for "CP210x" or "CH340". Linux/Mac: run <code>ls /dev/tty*</code> in terminal before and after plugging the ESP32 — the new entry is your port.
+  </div>
+</section>
+
+<!-- ══════════════════════════════ 04: PHASE 2 ══════════════════════════════ -->
+<section id="phase2">
+  <div class="section-tag">04 — Phase 2</div>
+  <h2>Data Collection Pipeline</h2>
+  <div class="label-row">
+    <span class="badge green">Week 2–3</span>
+    <span class="badge blue">pandas</span>
+    <span class="badge blue">pyserial</span>
+    <span class="badge amber">Most Critical Phase</span>
+  </div>
+  <p class="section-intro">This is your single most impactful contribution to the project. The ML model can only learn what you teach it. Every inaccuracy in the final product traces back to this phase. Build a structured, repeatable collection tool — not just a script.</p>
+
+  <h3>Dataset Structure</h3>
+
+  <div class="diagram-wrap">
+    <div class="diagram-label">CSV dataset schema</div>
+    <svg width="100%" viewBox="0 0 720 130" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10"  y="20" width="70" height="90" rx="6" fill="#1a2333" stroke="rgba(45,212,191,0.4)" stroke-width="1"/>
+      <rect x="90"  y="20" width="70" height="90" rx="6" fill="#1a2333" stroke="rgba(45,212,191,0.4)" stroke-width="1"/>
+      <rect x="170" y="20" width="70" height="90" rx="6" fill="#1a2333" stroke="rgba(45,212,191,0.4)" stroke-width="1"/>
+      <rect x="250" y="20" width="60" height="90" rx="6" fill="#1a2333" stroke="rgba(45,212,191,0.4)" stroke-width="1"/>
+      <rect x="320" y="20" width="60" height="90" rx="6" fill="#1a2333" stroke="rgba(45,212,191,0.4)" stroke-width="1"/>
+      <rect x="390" y="20" width="190" height="90" rx="6" fill="#1a2333" stroke="rgba(167,139,250,0.4)" stroke-width="1"/>
+      <rect x="590" y="20" width="100" height="90" rx="6" fill="#1a2333" stroke="rgba(248,113,113,0.4)" stroke-width="1"/>
+
+      <text x="45"  y="50" text-anchor="middle" fill="#2dd4bf" font-size="10" font-family="JetBrains Mono">thumb</text>
+      <text x="125" y="50" text-anchor="middle" fill="#2dd4bf" font-size="10" font-family="JetBrains Mono">index</text>
+      <text x="205" y="50" text-anchor="middle" fill="#2dd4bf" font-size="10" font-family="JetBrains Mono">middle</text>
+      <text x="280" y="50" text-anchor="middle" fill="#2dd4bf" font-size="10" font-family="JetBrains Mono">ring</text>
+      <text x="350" y="50" text-anchor="middle" fill="#2dd4bf" font-size="10" font-family="JetBrains Mono">pinky</text>
+      <text x="485" y="50" text-anchor="middle" fill="#a78bfa" font-size="10" font-family="JetBrains Mono">ax  ay  az  gx  gy  gz</text>
+      <text x="640" y="50" text-anchor="middle" fill="#f87171" font-size="10" font-family="JetBrains Mono">label</text>
+
+      <text x="45"  y="90" text-anchor="middle" fill="#e8edf5" font-size="12" font-family="JetBrains Mono">0.82</text>
+      <text x="125" y="90" text-anchor="middle" fill="#e8edf5" font-size="12" font-family="JetBrains Mono">0.70</text>
+      <text x="205" y="90" text-anchor="middle" fill="#e8edf5" font-size="12" font-family="JetBrains Mono">0.20</text>
+      <text x="280" y="90" text-anchor="middle" fill="#e8edf5" font-size="12" font-family="JetBrains Mono">0.15</text>
+      <text x="350" y="90" text-anchor="middle" fill="#e8edf5" font-size="12" font-family="JetBrains Mono">0.30</text>
+      <text x="485" y="90" text-anchor="middle" fill="#e8edf5" font-size="11" font-family="JetBrains Mono">0.12 -0.05 9.8 ...</text>
+      <text x="640" y="90" text-anchor="middle" fill="#f87171" font-size="12" font-family="JetBrains Mono">YES</text>
+
+      <text x="45"  y="68" text-anchor="middle" fill="#4d5963" font-size="9" font-family="Inter">← flex sensors →</text>
+      <text x="485" y="68" text-anchor="middle" fill="#4d5963" font-size="9" font-family="Inter">←── IMU (accel + gyro) ──→</text>
+      <text x="640" y="68" text-anchor="middle" fill="#4d5963" font-size="9" font-family="Inter">gesture</text>
+    </svg>
+  </div>
+
+  <h3>Gesture List (Phase 2 targets)</h3>
+  <div class="two-col">
+    <div class="phase-card p2">
+      <div class="phase-title" style="margin-bottom:10px">Static gestures (start here)</div>
+      <div class="tag-row">
+        <span class="tag">YES</span><span class="tag">NO</span><span class="tag">HELP</span>
+        <span class="tag">STOP</span><span class="tag">PLEASE</span><span class="tag">SORRY</span>
+        <span class="tag">WATER</span><span class="tag">FOOD</span>
+      </div>
+    </div>
+    <div class="phase-card p3">
+      <div class="phase-title" style="margin-bottom:10px">Dynamic gestures (Phase 3)</div>
+      <div class="tag-row">
+        <span class="tag">HI</span><span class="tag">BYE</span><span class="tag">COME</span>
+        <span class="tag">THANK YOU</span><span class="tag">GO AWAY</span>
+      </div>
+    </div>
+  </div>
+
+  <h3>Data Collection Tool</h3>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-filename">collect_data.py</span>
+      <span class="code-lang">Python</span>
+    </div>
+    <pre><span class="kw">import</span> serial, csv, time, os
+
+PORT     = <span class="str">'COM3'</span>
+BAUDRATE = <span class="num">9600</span>
+SAMPLES  = <span class="num">60</span>     <span class="cm"># minimum 60 per gesture</span>
+GESTURES = [<span class="str">'YES'</span>,<span class="str">'NO'</span>,<span class="str">'HELP'</span>,<span class="str">'STOP'</span>,<span class="str">'PLEASE'</span>,<span class="str">'WATER'</span>]
+OUTFILE  = <span class="str">'dataset.csv'</span>
+
+COLUMNS  = [<span class="str">'thumb'</span>,<span class="str">'index'</span>,<span class="str">'middle'</span>,<span class="str">'ring'</span>,<span class="str">'pinky'</span>,
+            <span class="str">'ax'</span>,<span class="str">'ay'</span>,<span class="str">'az'</span>,<span class="str">'gx'</span>,<span class="str">'gy'</span>,<span class="str">'gz'</span>,<span class="str">'label'</span>]
+
+port = serial.<span class="fn">Serial</span>(PORT, BAUDRATE, timeout=<span class="num">1</span>)
+write_header = <span class="kw">not</span> os.path.<span class="fn">exists</span>(OUTFILE)
+
+<span class="kw">with</span> <span class="fn">open</span>(OUTFILE, <span class="str">'a'</span>, newline=<span class="str">''</span>) <span class="kw">as</span> f:
+    writer = csv.<span class="fn">writer</span>(f)
+    <span class="kw">if</span> write_header:
+        writer.<span class="fn">writerow</span>(COLUMNS)
+
+    <span class="kw">for</span> gesture <span class="kw">in</span> GESTURES:
+        <span class="fn">input</span>(<span class="str">f"\n► Get ready to sign '{gesture}'. Press ENTER when ready..."</span>)
+        <span class="kw">print</span>(<span class="str">"  3..."</span>); time.<span class="fn">sleep</span>(<span class="num">1</span>)
+        <span class="kw">print</span>(<span class="str">"  2..."</span>); time.<span class="fn">sleep</span>(<span class="num">1</span>)
+        <span class="kw">print</span>(<span class="str">"  1... GO!"</span>); time.<span class="fn">sleep</span>(<span class="num">0.5</span>)
+
+        count = <span class="num">0</span>
+        <span class="kw">while</span> count &lt; SAMPLES:
+            raw  = port.<span class="fn">readline</span>().<span class="fn">decode</span>(<span class="str">'utf-8'</span>).<span class="fn">strip</span>()
+            vals = raw.<span class="fn">split</span>(<span class="str">','</span>)
+            <span class="kw">if</span> <span class="fn">len</span>(vals) == <span class="num">11</span>:
+                <span class="kw">try</span>:
+                    row = [<span class="fn">float</span>(v) <span class="kw">for</span> v <span class="kw">in</span> vals] + [gesture]
+                    writer.<span class="fn">writerow</span>(row)
+                    count += <span class="num">1</span>
+                    <span class="kw">print</span>(<span class="str">f"  [{count}/{SAMPLES}]"</span>, end=<span class="str">'\r'</span>)
+                <span class="kw">except</span> <span class="nb">ValueError</span>:
+                    <span class="kw">pass</span>
+
+        <span class="kw">print</span>(<span class="str">f"\n  ✓ {SAMPLES} samples saved for '{gesture}'"</span>)
+
+<span class="kw">print</span>(<span class="str">"\nDone! Dataset saved to dataset.csv"</span>)</pre>
+  </div>
+
+  <div class="info-box warn">
+    <div class="info-box-title">Data Quality Rules</div>
+    Record <strong>at least 60 samples per gesture</strong>. Record across <strong>multiple sessions</strong> (different days, different lighting). If possible, record with <strong>multiple people</strong> wearing the glove — different hand sizes produce different sensor values. Never mislabel — it poisons the model more than missing data.
+  </div>
+</section>
+
+<!-- ══════════════════════════════ 05: PHASE 3 ══════════════════════════════ -->
+<section id="phase3">
+  <div class="section-tag">05 — Phase 3</div>
+  <h2>ML Model Training</h2>
+  <div class="label-row">
+    <span class="badge green">Week 3–5</span>
+    <span class="badge purple">TensorFlow</span>
+    <span class="badge blue">scikit-learn</span>
+    <span class="badge blue">Jupyter</span>
+  </div>
+  <p class="section-intro">You train a neural network to recognize gesture patterns from sensor numbers. This runs on your laptop or Google Colab. The output is a model file that the glove will eventually run on-device.</p>
+
+  <h3>Complete Training Pipeline</h3>
+
+  <div class="diagram-wrap">
+    <div class="diagram-label">ML training workflow — top to bottom</div>
+    <svg width="100%" viewBox="0 0 700 600" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="a3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/>
+        </marker>
+      </defs>
+
+      <!-- Step boxes -->
+      <rect x="190" y="10"  width="320" height="60" rx="8" fill="#1a2333" stroke="rgba(167,139,250,0.5)" stroke-width="1"/>
+      <text x="350" y="35"  text-anchor="middle" fill="#7a8aa0" font-size="10" font-family="Inter">Step 1</text>
+      <text x="350" y="52"  text-anchor="middle" fill="#e8edf5" font-size="13" font-family="Inter" font-weight="500">Load dataset.csv with pandas</text>
+
+      <line x1="350" y1="70"  x2="350" y2="104" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#a3)"/>
+
+      <rect x="190" y="104" width="320" height="60" rx="8" fill="#1a2333" stroke="rgba(167,139,250,0.5)" stroke-width="1"/>
+      <text x="350" y="129" text-anchor="middle" fill="#7a8aa0" font-size="10" font-family="Inter">Step 2</text>
+      <text x="350" y="146" text-anchor="middle" fill="#e8edf5" font-size="13" font-family="Inter" font-weight="500">Normalize features (MinMaxScaler 0→1)</text>
+
+      <line x1="350" y1="164" x2="350" y2="198" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#a3)"/>
+
+      <rect x="190" y="198" width="320" height="60" rx="8" fill="#1a2333" stroke="rgba(167,139,250,0.5)" stroke-width="1"/>
+      <text x="350" y="223" text-anchor="middle" fill="#7a8aa0" font-size="10" font-family="Inter">Step 3</text>
+      <text x="350" y="240" text-anchor="middle" fill="#e8edf5" font-size="13" font-family="Inter" font-weight="500">Encode labels → one-hot vectors</text>
+
+      <line x1="350" y1="258" x2="350" y2="292" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#a3)"/>
+
+      <rect x="190" y="292" width="320" height="60" rx="8" fill="#1a2333" stroke="rgba(167,139,250,0.5)" stroke-width="1"/>
+      <text x="350" y="317" text-anchor="middle" fill="#7a8aa0" font-size="10" font-family="Inter">Step 4</text>
+      <text x="350" y="334" text-anchor="middle" fill="#e8edf5" font-size="13" font-family="Inter" font-weight="500">Split 80% train / 20% test</text>
+
+      <line x1="350" y1="352" x2="350" y2="386" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#a3)"/>
+
+      <rect x="140" y="386" width="200" height="60" rx="8" fill="#1a2333" stroke="rgba(167,139,250,0.5)" stroke-width="1"/>
+      <text x="240" y="411" text-anchor="middle" fill="#7a8aa0" font-size="10" font-family="Inter">Step 5A (static)</text>
+      <text x="240" y="428" text-anchor="middle" fill="#e8edf5" font-size="13" font-family="Inter" font-weight="500">Train Dense / CNN model</text>
+
+      <rect x="360" y="386" width="200" height="60" rx="8" fill="#1a2333" stroke="rgba(167,139,250,0.5)" stroke-width="1"/>
+      <text x="460" y="411" text-anchor="middle" fill="#7a8aa0" font-size="10" font-family="Inter">Step 5B (dynamic)</text>
+      <text x="460" y="428" text-anchor="middle" fill="#e8edf5" font-size="13" font-family="Inter" font-weight="500">Train LSTM model</text>
+
+      <line x1="240" y1="446" x2="240" y2="494" stroke="#a78bfa" stroke-width="1.5"/>
+      <line x1="460" y1="446" x2="460" y2="494" stroke="#a78bfa" stroke-width="1.5"/>
+      <line x1="240" y1="494" x2="460" y2="494" stroke="#a78bfa" stroke-width="1.5"/>
+      <line x1="350" y1="494" x2="350" y2="512" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#a3)"/>
+
+      <rect x="190" y="512" width="320" height="60" rx="8" fill="#1a2333" stroke="rgba(52,211,153,0.5)" stroke-width="1"/>
+      <text x="350" y="537" text-anchor="middle" fill="#7a8aa0" font-size="10" font-family="Inter">Step 6</text>
+      <text x="350" y="554" text-anchor="middle" fill="#34d399" font-size="13" font-family="Inter" font-weight="500">Evaluate + Export model files</text>
+    </svg>
+  </div>
+
+  <h3>Step 2: Why normalization matters</h3>
+  <p>Raw flex sensor values range from 200–4095. Accelerometer values are in m/s² (~0–10). If you feed these raw into a neural network, it treats the flex values (4095) as thousands of times more important than accelerometer values (9.8). Normalization rescales everything to 0–1 so the model treats all features equally.</p>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-filename">train.py — Steps 1–4: Load, normalize, encode, split</span>
+      <span class="code-lang">Python</span>
+    </div>
+    <pre><span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> tensorflow <span class="kw">as</span> tf
+<span class="kw">import</span> pickle
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> LabelEncoder, MinMaxScaler
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> train_test_split
+
+<span class="cm"># ── STEP 1: Load ────────────────────────────────────────────────</span>
+df = pd.<span class="fn">read_csv</span>(<span class="str">'dataset.csv'</span>)
+X  = df.<span class="fn">drop</span>(<span class="str">'label'</span>, axis=<span class="num">1</span>).values   <span class="cm"># shape: (n_samples, 11)</span>
+y  = df[<span class="str">'label'</span>].values
+
+<span class="cm"># ── STEP 2: Normalize to 0–1 ────────────────────────────────────</span>
+scaler = <span class="fn">MinMaxScaler</span>()
+X_norm = scaler.<span class="fn">fit_transform</span>(X)
+
+<span class="cm"># ── STEP 3: Encode labels ───────────────────────────────────────</span>
+encoder = <span class="fn">LabelEncoder</span>()
+y_enc   = encoder.<span class="fn">fit_transform</span>(y)        <span class="cm"># YES→0, NO→1, HELP→2 ...</span>
+y_cat   = tf.keras.utils.<span class="fn">to_categorical</span>(y_enc)  <span class="cm"># one-hot</span>
+
+<span class="cm"># ── STEP 4: Train/test split ─────────────────────────────────────</span>
+X_train, X_test, y_train, y_test = <span class="fn">train_test_split</span>(
+    X_norm, y_cat, test_size=<span class="num">0.2</span>, random_state=<span class="num">42</span>, stratify=y_cat
+)
+
+<span class="kw">print</span>(<span class="str">f"Train: {X_train.shape}, Test: {X_test.shape}"</span>)
+<span class="kw">print</span>(<span class="str">f"Classes: {encoder.classes_}"</span>)
+
+<span class="cm"># ── Save preprocessing objects ───────────────────────────────────</span>
+pickle.<span class="fn">dump</span>(scaler,  <span class="fn">open</span>(<span class="str">'scaler.pkl'</span>,  <span class="str">'wb'</span>))
+pickle.<span class="fn">dump</span>(encoder, <span class="fn">open</span>(<span class="str">'encoder.pkl'</span>, <span class="str">'wb'</span>))</pre>
+  </div>
+
+  <h3>Step 5A: Static Gesture Model (Dense Neural Network)</h3>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-filename">train.py — Dense model for static gestures</span>
+      <span class="code-lang">Python</span>
+    </div>
+    <pre><span class="cm"># Input: 11 sensor values → Output: gesture class probabilities</span>
+n_classes = <span class="fn">len</span>(encoder.classes_)
+
+model = tf.keras.<span class="fn">Sequential</span>([
+    tf.keras.layers.<span class="fn">Dense</span>(<span class="num">128</span>, activation=<span class="str">'relu'</span>, input_shape=(<span class="num">11</span>,)),
+    tf.keras.layers.<span class="fn">Dropout</span>(<span class="num">0.3</span>),              <span class="cm"># prevents overfitting</span>
+    tf.keras.layers.<span class="fn">Dense</span>(<span class="num">64</span>,  activation=<span class="str">'relu'</span>),
+    tf.keras.layers.<span class="fn">Dropout</span>(<span class="num">0.2</span>),
+    tf.keras.layers.<span class="fn">Dense</span>(<span class="num">32</span>,  activation=<span class="str">'relu'</span>),
+    tf.keras.layers.<span class="fn">Dense</span>(n_classes, activation=<span class="str">'softmax'</span>)  <span class="cm"># probability per class</span>
+])
+
+model.<span class="fn">compile</span>(
+    optimizer=<span class="str">'adam'</span>,
+    loss=<span class="str">'categorical_crossentropy'</span>,
+    metrics=[<span class="str">'accuracy'</span>]
+)
+
+history = model.<span class="fn">fit</span>(
+    X_train, y_train,
+    epochs=<span class="num">80</span>,
+    batch_size=<span class="num">16</span>,
+    validation_data=(X_test, y_test),
+    verbose=<span class="num">1</span>
+)
+
+model.<span class="fn">save</span>(<span class="str">'gesture_model_static.h5'</span>)</pre>
+  </div>
+
+  <h3>Step 5B: Dynamic Gesture Model (LSTM)</h3>
+  <p>For moving gestures like "HI" or "BYE", a single snapshot of sensor values isn't enough. You need to capture the sequence of readings over time (~20 frames). LSTM (Long Short-Term Memory) networks are designed exactly for this — they understand patterns over time.</p>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-filename">train_lstm.py — LSTM model for dynamic gestures</span>
+      <span class="code-lang">Python</span>
+    </div>
+    <pre><span class="cm"># For dynamic gestures, collect 20 consecutive frames per sample
+# X shape: (num_samples, 20, 11)  — 20 timesteps, 11 features each</span>
+
+TIMESTEPS = <span class="num">20</span>
+
+<span class="cm"># Reshape flat data into sequences (group 20 rows per gesture)</span>
+X_seq = X_norm.<span class="fn">reshape</span>(-<span class="num">1</span>, TIMESTEPS, <span class="num">11</span>)
+y_seq = y_cat[::<span class="num">20</span>]           <span class="cm"># one label per sequence</span>
+
+lstm_model = tf.keras.<span class="fn">Sequential</span>([
+    tf.keras.layers.<span class="fn">LSTM</span>(<span class="num">64</span>, return_sequences=<span class="nb">True</span>, input_shape=(TIMESTEPS, <span class="num">11</span>)),
+    tf.keras.layers.<span class="fn">LSTM</span>(<span class="num">32</span>),
+    tf.keras.layers.<span class="fn">Dense</span>(<span class="num">32</span>, activation=<span class="str">'relu'</span>),
+    tf.keras.layers.<span class="fn">Dense</span>(n_classes, activation=<span class="str">'softmax'</span>)
+])
+
+lstm_model.<span class="fn">compile</span>(optimizer=<span class="str">'adam'</span>, loss=<span class="str">'categorical_crossentropy'</span>, metrics=[<span class="str">'accuracy'</span>])
+lstm_model.<span class="fn">fit</span>(X_train_seq, y_train_seq, epochs=<span class="num">60</span>, validation_data=(X_test_seq, y_test_seq))
+lstm_model.<span class="fn">save</span>(<span class="str">'gesture_model_dynamic.h5'</span>)</pre>
+  </div>
+
+  <h3>Step 6: Evaluate Your Model</h3>
+  <p>Never just look at accuracy. Use a confusion matrix to see exactly which gestures are being confused with each other.</p>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-filename">evaluate.py</span>
+      <span class="code-lang">Python</span>
+    </div>
+    <pre><span class="kw">from</span> sklearn.metrics <span class="kw">import</span> classification_report, confusion_matrix
+<span class="kw">import</span> seaborn <span class="kw">as</span> sns
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+y_pred_probs = model.<span class="fn">predict</span>(X_test)
+y_pred = np.<span class="fn">argmax</span>(y_pred_probs, axis=<span class="num">1</span>)
+y_true = np.<span class="fn">argmax</span>(y_test,       axis=<span class="num">1</span>)
+
+<span class="kw">print</span>(<span class="fn">classification_report</span>(y_true, y_pred, target_names=encoder.classes_))
+
+cm = <span class="fn">confusion_matrix</span>(y_true, y_pred)
+sns.<span class="fn">heatmap</span>(cm, annot=<span class="nb">True</span>, fmt=<span class="str">'d'</span>,
+           xticklabels=encoder.classes_,
+           yticklabels=encoder.classes_)
+plt.<span class="fn">title</span>(<span class="str">'Confusion Matrix'</span>)
+plt.<span class="fn">show</span>()</pre>
+  </div>
+
+  <div class="info-box danger">
+    <div class="info-box-title">Overfitting Warning</div>
+    If training accuracy is 99% but test accuracy is 70%, your model has memorized the training data and can't generalize. Fix: collect more diverse data, increase Dropout, reduce model size, or train for fewer epochs.
+  </div>
+</section>
+
+<!-- ══════════════════════════════ 06: PHASE 4 ══════════════════════════════ -->
+<section id="phase4">
+  <div class="section-tag">06 — Phase 4</div>
+  <h2>TinyML Deployment to ESP32</h2>
+  <div class="label-row">
+    <span class="badge green">Week 5–7</span>
+    <span class="badge amber">Edge Impulse</span>
+    <span class="badge blue">TFLite</span>
+  </div>
+  <p class="section-intro">Your trained model lives on your laptop. This phase moves it onto the ESP32 microcontroller so it runs on-device — no Wi-Fi, no cloud, no laptop. This is called TinyML.</p>
+
+  <h3>Two Paths to Deployment</h3>
+
+  <div class="two-col">
+    <div class="phase-card p4">
+      <div class="phase-header">
+        <div class="phase-title">Path A: Edge Impulse</div>
+        <span class="badge amber">Recommended</span>
+      </div>
+      <p style="font-size:13px; color:var(--muted); margin:8px 0 12px">Web platform that handles the entire pipeline. Upload your dataset, train a model on their servers, download C++ Arduino library.</p>
+      <ul class="step-list">
+        <li><span class="step-num">1</span>Create free account at edgeimpulse.com</li>
+        <li><span class="step-num">2</span>Upload your CSV dataset</li>
+        <li><span class="step-num">3</span>Design an impulse (processing blocks)</li>
+        <li><span class="step-num">4</span>Train the model on their servers</li>
+        <li><span class="step-num">5</span>Download "Arduino library" ZIP</li>
+        <li><span class="step-num">6</span>Give ZIP to hardware team to flash</li>
+      </ul>
+    </div>
+    <div class="phase-card p3">
+      <div class="phase-header">
+        <div class="phase-title">Path B: TensorFlow Lite</div>
+        <span class="badge purple">Full control</span>
+      </div>
+      <p style="font-size:13px; color:var(--muted); margin:8px 0 12px">Convert your own trained model to a tiny format that runs on microcontrollers. More work, but you control every step.</p>
+      <ul class="step-list">
+        <li><span class="step-num">1</span>Train model in TensorFlow (Phase 3)</li>
+        <li><span class="step-num">2</span>Convert to .tflite (quantized)</li>
+        <li><span class="step-num">3</span>Convert .tflite to C byte array</li>
+        <li><span class="step-num">4</span>Embed array in ESP32 firmware</li>
+        <li><span class="step-num">5</span>Hardware team flashes the firmware</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Path B: TFLite Conversion Code</h3>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-filename">export_tflite.py</span>
+      <span class="code-lang">Python</span>
+    </div>
+    <pre><span class="kw">import</span> tensorflow <span class="kw">as</span> tf
+
+model = tf.keras.models.<span class="fn">load_model</span>(<span class="str">'gesture_model_static.h5'</span>)
+
+<span class="cm"># Convert and quantize (shrinks model size ~4x, speeds up inference)</span>
+converter = tf.lite.TFLiteConverter.<span class="fn">from_keras_model</span>(model)
+converter.optimizations = [tf.lite.Optimize.<span class="nb">DEFAULT</span>]
+tflite_model = converter.<span class="fn">convert</span>()
+
+<span class="kw">with</span> <span class="fn">open</span>(<span class="str">'gesture_model.tflite'</span>, <span class="str">'wb'</span>) <span class="kw">as</span> f:
+    f.<span class="fn">write</span>(tflite_model)
+
+<span class="kw">print</span>(<span class="str">f"Model size: {len(tflite_model) / 1024:.1f} KB"</span>)
+
+<span class="cm"># Convert to C header file for embedding in ESP32 firmware
+# Run in terminal: xxd -i gesture_model.tflite > gesture_model.h
+# Then give gesture_model.h to the hardware team</span></pre>
+  </div>
+
+  <div class="info-box note">
+    <div class="info-box-title">Your deliverable for Phase 4</div>
+    You hand the hardware team either: (A) the Edge Impulse Arduino library ZIP, or (B) the <code>gesture_model.h</code> C header file + <code>scaler_params.h</code> containing your normalization min/max values so the ESP32 can normalize inputs the same way you did during training.
+  </div>
+
+  <h3>Normalization Parameters for Hardware Team</h3>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-filename">export_scaler_params.py</span>
+      <span class="code-lang">Python</span>
+    </div>
+    <pre><span class="kw">import</span> pickle, numpy <span class="kw">as</span> np
+
+scaler = pickle.<span class="fn">load</span>(<span class="fn">open</span>(<span class="str">'scaler.pkl'</span>, <span class="str">'rb'</span>))
+
+<span class="kw">print</span>(<span class="str">"// Paste this into ESP32 firmware"</span>)
+<span class="kw">print</span>(<span class="str">f"float data_min[] = {{{', '.join([f'{v:.4f}' for v in scaler.data_min_])}}};"</span>)
+<span class="kw">print</span>(<span class="str">f"float data_max[] = {{{', '.join([f'{v:.4f}' for v in scaler.data_max_])}}};"</span>)
+<span class="kw">print</span>(<span class="str">f"// Labels: {list(encoder.classes_)}"</span>)</pre>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ 07: PHASE 5 ══════════════════════════════ -->
+<section id="phase5">
+  <div class="section-tag">07 — Phase 5</div>
+  <h2>Voice Output</h2>
+  <div class="label-row">
+    <span class="badge green">Week 7–10</span>
+    <span class="badge coral">Android</span>
+    <span class="badge blue">Bluetooth</span>
+    <span class="badge blue">TTS</span>
+  </div>
+  <p class="section-intro">The ESP32 now knows what gesture was made and outputs a word like "HELP" over Bluetooth. Your job is to receive that word and speak it out loud. Two routes — pick based on your team's skills.</p>
+
+  <h3>Voice Output Flowchart</h3>
+
+  <div class="diagram-wrap">
+    <div class="diagram-label">From gesture detection to spoken word</div>
+    <svg width="100%" viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="a5" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#f87171" stroke-width="1.5" stroke-linecap="round"/>
+        </marker>
+      </defs>
+      <rect x="10"  y="60" width="130" height="60" rx="8" fill="#1a2333" stroke="rgba(248,113,113,0.4)" stroke-width="1"/>
+      <text x="75"  y="86" text-anchor="middle" fill="#7a8aa0" font-size="10" font-family="Inter">ESP32</text>
+      <text x="75"  y="104" text-anchor="middle" fill="#e8edf5" font-size="12" font-family="Inter" font-weight="500">Gesture detected</text>
+
+      <line x1="140" y1="90" x2="178" y2="90" stroke="#f87171" stroke-width="1.5" marker-end="url(#a5)"/>
+      <text x="160" y="82" text-anchor="middle" fill="#f87171" font-size="10" font-family="Inter">BT</text>
+
+      <rect x="178" y="60" width="140" height="60" rx="8" fill="#1a2333" stroke="rgba(248,113,113,0.4)" stroke-width="1"/>
+      <text x="248" y="86" text-anchor="middle" fill="#7a8aa0" font-size="10" font-family="Inter">Sends word</text>
+      <text x="248" y="104" text-anchor="middle" fill="#e8edf5" font-size="12" font-family="Inter" font-weight="500">"HELP" over BT serial</text>
+
+      <line x1="318" y1="90" x2="356" y2="90" stroke="#f87171" stroke-width="1.5" marker-end="url(#a5)"/>
+
+      <rect x="356" y="60" width="150" height="60" rx="8" fill="#1a2333" stroke="rgba(248,113,113,0.4)" stroke-width="1"/>
+      <text x="431" y="86" text-anchor="middle" fill="#7a8aa0" font-size="10" font-family="Inter">Android App</text>
+      <text x="431" y="104" text-anchor="middle" fill="#e8edf5" font-size="12" font-family="Inter" font-weight="500">Receives text string</text>
+
+      <line x1="506" y1="90" x2="544" y2="90" stroke="#f87171" stroke-width="1.5" marker-end="url(#a5)"/>
+
+      <rect x="544" y="60" width="140" height="60" rx="8" fill="#1a2333" stroke="rgba(52,211,153,0.5)" stroke-width="1"/>
+      <text x="614" y="86" text-anchor="middle" fill="#34d399" font-size="10" font-family="Inter">TTS Engine</text>
+      <text x="614" y="104" text-anchor="middle" fill="#e8edf5" font-size="12" font-family="Inter" font-weight="500">Speaks "HELP" aloud</text>
+    </svg>
+  </div>
+
+  <h3>Route A: MIT App Inventor (Fastest — 2 hours)</h3>
+  <p>Drag-and-drop Android app builder. No real coding. Connect Bluetooth, receive text, speak it. Perfect for demo purposes.</p>
+
+  <ul class="step-list">
+    <li><span class="step-num">1</span>Go to appinventor.mit.edu and create a new project</li>
+    <li><span class="step-num">2</span>Add a BluetoothClient component and a TextToSpeech component</li>
+    <li><span class="step-num">3</span>Add a Clock component with interval 100ms to poll incoming BT data</li>
+    <li><span class="step-num">4</span>In Blocks editor: when Clock fires → if BT.BytesAvailable > 0 → receive text → TTS.Speak(text)</li>
+    <li><span class="step-num">5</span>Build APK and install on Android phone</li>
+  </ul>
+
+  <h3>Route B: Android Studio (Full App)</h3>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="code-filename">MainActivity.kt — Bluetooth TTS receiver</span>
+      <span class="code-lang">Kotlin / Android</span>
+    </div>
+    <pre><span class="kw">class</span> <span class="fn">MainActivity</span> : AppCompatActivity() {
+
+    <span class="kw">private lateinit var</span> tts: TextToSpeech
+    <span class="kw">private var</span> bluetoothSocket: BluetoothSocket? = <span class="kw">null</span>
+
+    <span class="kw">override fun</span> <span class="fn">onCreate</span>(savedInstanceState: Bundle?) {
+        <span class="fn">super.onCreate</span>(savedInstanceState)
+
+        <span class="cm">// Init TTS on app launch (not per word — this is the key for low latency)</span>
+        tts = <span class="fn">TextToSpeech</span>(<span class="kw">this</span>) { status ->
+            <span class="kw">if</span> (status == TextToSpeech.SUCCESS)
+                tts.<span class="fn">setLanguage</span>(Locale.US)
+        }
+
+        <span class="fn">connectBluetooth</span>()
+        <span class="fn">startListening</span>()
+    }
+
+    <span class="kw">private fun</span> <span class="fn">startListening</span>() {
+        Thread {
+            <span class="kw">val</span> reader = bluetoothSocket?.inputStream?.bufferedReader()
+            reader?.<span class="fn">forEachLine</span> { word ->
+                <span class="kw">runOnUiThread</span> {
+                    tts.<span class="fn">speak</span>(word.trim(), TextToSpeech.QUEUE_FLUSH, <span class="kw">null</span>, <span class="kw">null</span>)
+                    statusText.text = <span class="str">"Recognized: $word"</span>
+                }
+            }
+        }.<span class="fn">start</span>()
+    }
+}</pre>
+  </div>
+
+  <div class="info-box tip">
+    <div class="info-box-title">Low-latency tip</div>
+    Always initialize the TextToSpeech engine when the app opens, not when a word arrives. Cold-starting TTS per word adds 300–800ms of delay, which makes the glove feel broken even if the ML model is fast.
+  </div>
+</section>
+
+<!-- ══════════════════════════════ 08: FULL ARCH ══════════════════════════════ -->
+<section id="architecture">
+  <div class="section-tag">08 — Architecture</div>
+  <h2>Full System Architecture</h2>
+  <p class="section-intro">The complete software stack from sensor to voice. Every component you own is highlighted.</p>
+
+  <div class="diagram-wrap">
+    <div class="diagram-label">Complete software system — your components in blue/purple</div>
+    <svg width="100%" viewBox="0 0 700 560" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="af" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#4f9cf9" stroke-width="1.5" stroke-linecap="round"/>
+        </marker>
+        <marker id="afg" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M2 1L8 5L2 9" fill="none" stroke="#34d399" stroke-width="1.5" stroke-linecap="round"/>
+        </marker>
+      </defs>
+
+      <!-- HW layer -->
+      <rect x="30" y="10" width="640" height="80" rx="10" fill="#111827" stroke="rgba(255,255,255,0.07)" stroke-width="1" stroke-dasharray="4,3"/>
+      <text x="40" y="30" fill="#4d5963" font-size="10" font-family="Inter" font-weight="500">HARDWARE TEAM</text>
+      <rect x="50"  y="38" width="140" height="44" rx="6" fill="#1a2333" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+      <text x="120" y="65" text-anchor="middle" fill="#e8edf5" font-size="12" font-family="Inter" font-weight="500">Glove + Sensors</text>
+      <rect x="220" y="38" width="140" height="44" rx="6" fill="#1a2333" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+      <text x="290" y="65" text-anchor="middle" fill="#e8edf5" font-size="12" font-family="Inter" font-weight="500">ESP32 Firmware</text>
+      <rect x="390" y="38" width="140" height="44" rx="6" fill="#1a2333" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+      <text x="460" y="65" text-anchor="middle" fill="#e8edf5" font-size="12" font-family="Inter" font-weight="500">USB / Bluetooth</text>
+
+      <line x1="190" y1="60" x2="218" y2="60" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" marker-end="url(#af)"/>
+      <line x1="360" y1="60" x2="388" y2="60" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" marker-end="url(#af)"/>
+
+      <!-- handoff arrow -->
+      <line x1="350" y1="90" x2="350" y2="130" stroke="#4f9cf9" stroke-width="2" marker-end="url(#af)" stroke-dasharray="5,3"/>
+      <text x="360" y="118" fill="#4f9cf9" font-size="10" font-family="Inter">serial / BT</text>
+
+      <!-- SW layer -->
+      <rect x="30" y="130" width="640" height="380" rx="10" fill="#111827" stroke="rgba(79,156,249,0.2)" stroke-width="1" stroke-dasharray="4,3"/>
+      <text x="40" y="152" fill="#4f9cf9" font-size="10" font-family="Inter" font-weight="500">SOFTWARE TEAM (YOU)</text>
+
+      <!-- Phase 1 -->
+      <rect x="50"  y="162" width="180" height="56" rx="8" fill="#1a2333" stroke="rgba(45,212,191,0.5)" stroke-width="1"/>
+      <text x="140" y="183" text-anchor="middle" fill="#2dd4bf" font-size="10" font-family="Inter">Phase 1</text>
+      <text x="140" y="200" text-anchor="middle" fill="#e8edf5" font-size="12" font-family="Inter" font-weight="500">serial_reader.py</text>
+      <text x="140" y="214" text-anchor="middle" fill="#7a8aa0" font-size="10" font-family="Inter">parse + validate + log</text>
+
+      <!-- Phase 2 -->
+      <rect x="260" y="162" width="180" height="56" rx="8" fill="#1a2333" stroke="rgba(45,212,191,0.5)" stroke-width="1"/>
+      <text x="350" y="183" text-anchor="middle" fill="#2dd4bf" font-size="10" font-family="Inter">Phase 2</text>
+      <text x="350" y="200" text-anchor="middle" fill="#e8edf5" font-size="12" font-family="Inter" font-weight="500">collect_data.py</text>
+      <text x="350" y="214" text-anchor="middle" fill="#7a8aa0" font-size="10" font-family="Inter">record + label + CSV</text>
+
+      <!-- Dataset box -->
+      <rect x="470" y="162" width="180" height="56" rx="8" fill="#1a2333" stroke="rgba(45,212,191,0.3)" stroke-width="1" stroke-dasharray="4,2"/>
+      <text x="560" y="183" text-anchor="middle" fill="#7a8aa0" font-size="10" font-family="Inter">Artifact</text>
+      <text x="560" y="200" text-anchor="middle" fill="#e8edf5" font-size="12" font-family="Inter" font-weight="500">dataset.csv</text>
+      <text x="560" y="214" text-anchor="middle" fill="#7a8aa0" font-size="10" font-family="Inter">N × 12 labeled rows</text>
+
+      <line x1="230" y1="190" x2="258" y2="190" stroke="#2dd4bf" stroke-width="1.5" marker-end="url(#af)"/>
+      <line x1="440" y1="190" x2="468" y2="190" stroke="#2dd4bf" stroke-width="1.5" marker-end="url(#af)"/>
+
+      <!-- Arrow down to Phase 3 -->
+      <line x1="560" y1="218" x2="560" y2="268" stroke="#4f9cf9" stroke-width="1.5"/>
+      <line x1="560" y1="268" x2="352" y2="268" stroke="#4f9cf9" stroke-width="1.5" marker-end="url(#af)"/>
+
+      <!-- Phase 3 -->
+      <rect x="150" y="278" width="400" height="56" rx="8" fill="#1a2333" stroke="rgba(167,139,250,0.5)" stroke-width="1"/>
+      <text x="350" y="299" text-anchor="middle" fill="#a78bfa" font-size="10" font-family="Inter">Phase 3 — ML Training (Jupyter / Google Colab)</text>
+      <text x="350" y="316" text-anchor="middle" fill="#e8edf5" font-size="12" font-family="Inter" font-weight="500">train.py — normalize → encode → train → evaluate → export</text>
+
+      <line x1="350" y1="334" x2="350" y2="368" stroke="#4f9cf9" stroke-width="1.5" marker-end="url(#af)"/>
+
+      <!-- Phase 4 -->
+      <rect x="50"  y="368" width="280" height="56" rx="8" fill="#1a2333" stroke="rgba(251,191,36,0.5)" stroke-width="1"/>
+      <text x="190" y="389" text-anchor="middle" fill="#fbbf24" font-size="10" font-family="Inter">Phase 4 — Deployment</text>
+      <text x="190" y="406" text-anchor="middle" fill="#e8edf5" font-size="12" font-family="Inter" font-weight="500">export_tflite.py → Edge Impulse</text>
+      <text x="190" y="420" text-anchor="middle" fill="#7a8aa0" font-size="10" font-family="Inter">Hand .h file to hardware team</text>
+
+      <!-- Phase 5 -->
+      <rect x="370" y="368" width="280" height="56" rx="8" fill="#1a2333" stroke="rgba(248,113,113,0.5)" stroke-width="1"/>
+      <text x="510" y="389" text-anchor="middle" fill="#f87171" font-size="10" font-family="Inter">Phase 5 — Voice Output</text>
+      <text x="510" y="406" text-anchor="middle" fill="#e8edf5" font-size="12" font-family="Inter" font-weight="500">Android App / MIT App Inventor</text>
+      <text x="510" y="420" text-anchor="middle" fill="#7a8aa0" font-size="10" font-family="Inter">Bluetooth → TTS → Speaker</text>
+
+      <!-- Final integration arrow -->
+      <line x1="190" y1="424" x2="190" y2="464" stroke="#34d399" stroke-width="1.5"/>
+      <line x1="510" y1="424" x2="510" y2="464" stroke="#34d399" stroke-width="1.5"/>
+      <line x1="190" y1="464" x2="510" y2="464" stroke="#34d399" stroke-width="1.5"/>
+      <line x1="350" y1="464" x2="350" y2="482" stroke="#34d399" stroke-width="2" marker-end="url(#afg)"/>
+
+      <rect x="200" y="482" width="300" height="44" rx="8" fill="#1a2333" stroke="rgba(52,211,153,0.6)" stroke-width="1"/>
+      <text x="350" y="500" text-anchor="middle" fill="#34d399" font-size="10" font-family="Inter">Final Output</text>
+      <text x="350" y="516" text-anchor="middle" fill="#e8edf5" font-size="13" font-family="Inter" font-weight="600">Gesture → Recognized Word → Voice</text>
+    </svg>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ 09: PITFALLS ══════════════════════════════ -->
+<section id="pitfalls">
+  <div class="section-tag">09 — Common Pitfalls</div>
+  <h2>What Will Go Wrong (and How to Fix It)</h2>
+  <p class="section-intro">These are the exact problems every team building this kind of project hits. Learn them now so you recognize them when they happen.</p>
+
+  <div class="phase-card p5" style="margin-bottom:16px">
+    <div class="phase-header"><div class="phase-title">Model works on laptop, fails on real gestures</div></div>
+    <p style="font-size:14px; color:var(--muted)"><strong>Cause:</strong> Training data was recorded in one session with one person, glove fit differently during demo. <strong>Fix:</strong> Record 100+ samples per gesture across multiple sessions and people. Add ±5% noise to training data artificially.</p>
+  </div>
+
+  <div class="phase-card p5" style="margin-bottom:16px">
+    <div class="phase-header"><div class="phase-title">Two gestures keep getting confused</div></div>
+    <p style="font-size:14px; color:var(--muted)"><strong>Cause:</strong> They produce similar sensor patterns. Find them using the confusion matrix. <strong>Fix:</strong> Collect 100 more samples of each specifically, on different days. Or physically redesign one of the signs to be more distinct.</p>
+  </div>
+
+  <div class="phase-card p5" style="margin-bottom:16px">
+    <div class="phase-header"><div class="phase-title">High accuracy in training, low in real use</div></div>
+    <p style="font-size:14px; color:var(--muted)"><strong>Cause:</strong> Overfitting — model memorized training samples. <strong>Fix:</strong> Increase Dropout to 0.4, collect more diverse data, train for fewer epochs, check that test set isn't contaminated with training samples.</p>
+  </div>
+
+  <div class="phase-card p5" style="margin-bottom:16px">
+    <div class="phase-header"><div class="phase-title">Long delay between gesture and voice</div></div>
+    <p style="font-size:14px; color:var(--muted)"><strong>Cause:</strong> Usually TTS engine cold-starting per word, or Bluetooth packet buffering. <strong>Fix:</strong> Init TTS on app launch. Flush Bluetooth buffer immediately on receipt. Check if serial baud rate is too slow.</p>
+  </div>
+
+  <div class="phase-card p5">
+    <div class="phase-header"><div class="phase-title">Sensor values different between sessions</div></div>
+    <p style="font-size:14px; color:var(--muted)"><strong>Cause:</strong> Flex sensors drift with temperature and repeated bending. Glove fits slightly differently each time. <strong>Fix:</strong> Add a calibration step at app startup — record 5 seconds of "flat hand" to set a baseline offset. Normalize relative to baseline, not absolute values.</p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ 10: CHECKLIST ══════════════════════════════ -->
+<section id="checklist">
+  <div class="section-tag">10 — Team Checklist</div>
+  <h2>Software Team Checklist</h2>
+  <p class="section-intro">Use this as your progress tracker. Every item below represents a concrete deliverable or decision your team needs to complete.</p>
+
+  <h3>Week 1–2 (Phase 1)</h3>
+  <ul class="checklist">
+    <li>Define serial data format with hardware team and write it down</li>
+    <li>Install Python, VS Code, pyserial, pandas, matplotlib</li>
+    <li>Write and test <code>serial_reader.py</code> — can you see live sensor values?</li>
+    <li>Confirm all 11 fields are arriving correctly and consistently</li>
+    <li>Set up Git repository and push initial scripts</li>
+  </ul>
+
+  <h3>Week 2–3 (Phase 2)</h3>
+  <ul class="checklist">
+    <li>Finalize gesture list with the full team</li>
+    <li>Write and test <code>collect_data.py</code> with countdown timer</li>
+    <li>Record 60+ samples for each static gesture</li>
+    <li>Record across at least 2 sessions on different days</li>
+    <li>Verify dataset.csv has no missing values or mislabeled rows</li>
+    <li>Visualize sensor value distributions per gesture</li>
+  </ul>
+
+  <h3>Week 3–5 (Phase 3)</h3>
+  <ul class="checklist">
+    <li>Install TensorFlow, scikit-learn, Jupyter, seaborn</li>
+    <li>Complete preprocessing pipeline (normalize, encode, split)</li>
+    <li>Train static gesture model with 80%+ test accuracy</li>
+    <li>Generate confusion matrix and identify weak gesture pairs</li>
+    <li>Save <code>gesture_model.h5</code>, <code>scaler.pkl</code>, <code>encoder.pkl</code></li>
+    <li>If dynamic gestures: collect sequence data and train LSTM</li>
+  </ul>
+
+  <h3>Week 5–7 (Phase 4)</h3>
+  <ul class="checklist">
+    <li>Choose deployment path: Edge Impulse or TFLite</li>
+    <li>If Edge Impulse: upload dataset, train, download Arduino library</li>
+    <li>If TFLite: run <code>export_tflite.py</code> and confirm model size &lt; 100KB</li>
+    <li>Export normalization parameters for hardware team</li>
+    <li>Test that model gives same predictions as laptop version</li>
+    <li>Hand deliverable to hardware team</li>
+  </ul>
+
+  <h3>Week 7–10 (Phase 5)</h3>
+  <ul class="checklist">
+    <li>Build or configure voice output app (MIT App Inventor or Android Studio)</li>
+    <li>Test Bluetooth connection between ESP32 and phone</li>
+    <li>Confirm TTS speaks correctly for all gesture labels</li>
+    <li>Measure end-to-end latency: gesture → voice (target: under 1 second)</li>
+    <li>Full demo run: perform all gestures, verify voice output</li>
+    <li>Document any remaining accuracy issues and workarounds</li>
+  </ul>
+</section>
+
+<!-- ══════════════════════════════ FOOTER ══════════════════════════════ -->
+<div class="footer">
+  <p>ISL Sign Language Vocalizer · Software Documentation v1.0</p>
+  <p style="margin-top:6px">Python · TensorFlow · Edge Impulse · Android · Bluetooth TTS</p>
+</div>
+
+</div><!-- .page -->
+</body>
+</html>
